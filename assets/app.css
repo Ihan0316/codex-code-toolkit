@@ -380,6 +380,20 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
 /* mermaid */
 .mermaid { margin: 22px 0; text-align: center; overflow-x: auto; padding: 18px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .mermaid svg { max-width: 100%; height: auto; }
+/* 한글 강제: mermaid 테마 CSS는 SVG <text>에 trebuchet ms를 박는데, 여기엔 한글 글리프가 없어
+   Chromium SVG 폴백이 깨진다("경계 위반"→"겨게 이바"). 한글 완비 폰트를 !important로 강제해
+   플로차트·시퀀스 다이어그램의 모든 라벨(SVG text·HTML foreignObject)을 정상 렌더시킨다. */
+.mermaid svg text,
+.mermaid .nodeLabel,
+.mermaid .edgeLabel,
+.mermaid .messageText,
+.mermaid .loopText,
+.mermaid .actor,
+.mermaid text.actor tspan,
+.mermaid span,
+.mermaid foreignObject div {
+  font-family: "Pretendard", system-ui, -apple-system, "Malgun Gothic", sans-serif !important;
+}
 .mermaid:not(:has(svg)) { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); }
 
 /* ===== Mobile ===== */

@@ -90,9 +90,19 @@
           window.__mermaid.initialize({
             startOnLoad: false, securityLevel: "loose",
             theme: "base",
-            fontFamily: "JetBrains Mono, Pretendard, sans-serif",
+            // 한글 라벨 렌더 핵심:
+            // (1) htmlLabels:false → 라벨을 foreignObject(HTML) 대신 SVG <text>로 렌더.
+            //     mermaid의 foreignObject HTML 라벨은 Chromium에서 한글 자모가 깨진다
+            //     (단일행 라벨: "경계 위반"→"겨게 이바"). SVG <text>는 정상 렌더됨(확인 완료).
+            // (2) fontFamily는 한글 완비 폰트(Pretendard) — SVG <text>가 한글 글리프를 바로 그림.
+            fontFamily: "Pretendard, system-ui, -apple-system, 'Malgun Gothic', sans-serif",
+            htmlLabels: false,
+            flowchart: { htmlLabels: false },
             themeVariables: {
               background: "transparent",
+              // SVG <text>(엣지 라벨·시퀀스 다이어그램)에 실제 적용되는 폰트 — 한글 완비 폰트 필수.
+              // 이걸 안 주면 mermaid 기본값(trebuchet ms)이 적용돼 한글이 깨진다.
+              fontFamily: "Pretendard, system-ui, -apple-system, 'Malgun Gothic', sans-serif",
               primaryColor: dark ? "#12241e" : "#e6f6f0",
               primaryBorderColor: "#10a37f",
               primaryTextColor: dark ? "#e9ecf5" : "#161b27",
