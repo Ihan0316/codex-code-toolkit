@@ -1,0 +1,22 @@
+# 자격증명·비밀은 절대 커밋 금지
+auth.json
+.credentials.json
+*.credentials.json
+.env
+*.key
+*.pem
+*-token.json
+*secret*
+
+# Codex 런타임 상태 (머신 로컬)
+history.jsonl
+sessions/
+
+# OS / 편집기
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# 런타임
+*.log

@@ -1,0 +1,18 @@
+# codex-code-toolkit — 자동 보고 cron 예시
+# 편집: `crontab -e` 로 붙여넣고 <경로>를 실제 경로로 교체.
+#
+# 전제
+#  - codex 가 PATH에 있어야 함(cron은 최소 환경 → 절대경로나 PATH 지정 권장).
+#  - 인증: 대화형 로그인이 어려운 headless라면 CODEX_API_KEY 환경변수 사용.
+#  - Windows: WSL2 안의 crontab 또는 작업 스케줄러에서 `wsl bash ...` 호출.
+#  - macOS: cron 대신 launchd(.plist)도 가능. cron은 '전체 디스크 접근' 권한이 필요할 수 있음.
+
+# 환경(선택) — cron은 로그인 셸 프로필을 안 읽으므로 필요한 것만 명시
+PATH=/usr/local/bin:/usr/bin:/bin
+# CODEX_API_KEY=<발급키>          # headless 인증이 필요할 때만. 실제 키를 공개 저장소에 커밋 금지!
+
+# 평일(월~금) 19:00 — 일일보고
+0 19 * * 1-5  bash <경로>/daily-report.sh >> <경로>/cron.log 2>&1
+
+# 매주 금 18:30 — 주간보고
+30 18 * * 5   bash <경로>/weekly-report.sh >> <경로>/cron.log 2>&1

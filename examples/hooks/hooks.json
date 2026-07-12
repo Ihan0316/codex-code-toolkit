@@ -1,0 +1,32 @@
+{
+  "//": "산티타이즈된 ~/.codex/hooks.json 예시 (Codex lifecycle hooks). <HOOKS_DIR>를 실제 경로로 교체.",
+  "//2": "config.toml 의 [hooks] 인라인과 이 파일 중 하나만 두세요(둘 다면 경고). 신흥 기능 — /hooks 로 확인.",
+  "description": "codex-code-toolkit 예시 훅 세트",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"<HOOKS_DIR>/session-context.sh\"",
+            "timeout": 10,
+            "statusMessage": "세션 컨텍스트 로딩 중…"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"<HOOKS_DIR>/guard-bash.py\"",
+            "timeout": 10,
+            "statusMessage": "위험 명령 검사 중"
+          }
+        ]
+      }
+    ]
+  }
+}

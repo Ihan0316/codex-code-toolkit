@@ -1,0 +1,69 @@
+# ~/.codex/config.toml — 산티타이즈된 예시 (Codex CLI)
+# <...> placeholder를 본인 환경에 맞게 채우세요. 자격증명(auth.json)은 이 파일에 넣지 않습니다.
+# 설정 우선순위(높음→낮음): CLI 플래그/--config > 프로젝트 .codex/config.toml > 프로필 > 이 파일 > /etc/codex/config.toml > 기본값
+
+# ── 모델 / 추론 ─────────────────────────────────────────────
+# model = "<모델명>"                 # 생략 시 계정 기본 모델
+model_reasoning_effort = "medium"     # minimal | low | medium | high | xhigh
+# model_verbosity      = "medium"     # low | medium | high (GPT-5 계열)
+# model_auto_compact_token_limit = 350000   # 이 토큰을 넘으면 자동 compaction
+
+# ── 안전: 샌드박스 + 승인 (핵심) ────────────────────────────
+approval_policy = "on-request"        # untrusted | on-request | never   (on-failure는 deprecated)
+sandbox_mode    = "workspace-write"   # read-only | workspace-write | danger-full-access
+
+[sandbox_workspace_write]
+network_access         = false        # workspace-write에서 네트워크는 기본 차단
+writable_roots         = []           # 예: ["/Users/<you>/.pyenv/shims"]
+exclude_tmpdir_env_var = false
+exclude_slash_tmp      = false
+
+# ── 편의 ────────────────────────────────────────────────────
+file_opener = "vscode"                # 인용 경로를 클릭 가능한 링크로 (vscode|cursor|windsurf|none)
+# web_search = "live"                 # disabled | cached | indexed | live   (CLI: codex --search)
+
+[tui]
+notifications = ["agent-turn-complete"]   # 턴 완료 시 터미널 알림
+# theme = "dark"
+
+[history]
+persistence = "save-all"              # save-all | none
+# max_bytes = 104857600
+
+# ── 프로필: 모델·승인·샌드박스 묶음을 이름으로 (codex --profile <name>) ──
+[profiles.readonly]
+approval_policy = "untrusted"
+sandbox_mode    = "read-only"
+
+[profiles.auto]
+approval_policy = "on-request"
+sandbox_mode    = "workspace-write"
+
+# ── notify: 턴 완료 등 이벤트 시 외부 프로그램 실행 (argv[1]=JSON) ──
+notify = ["python3", "<CODEX_HOME>/notify.py"]
+
+# ── MCP 서버 ────────────────────────────────────────────────
+# stdio 서버 (로컬 프로세스)
+[mcp_servers.context7]
+command = "npx"
+args    = ["-y", "@upstash/context7-mcp"]
+# env   = { SOME_KEY = "value" }         # 필요 시. 토큰은 env로만, 평문 커밋 금지
+startup_timeout_sec = 10
+tool_timeout_sec    = 60
+
+# streamable HTTP 서버 (원격) — 토큰은 환경변수 이름으로만 참조
+[mcp_servers.example_remote]
+url                  = "https://mcp.example.com/mcp"
+bearer_token_env_var = "EXAMPLE_MCP_TOKEN"    # 실제 토큰이 아니라 '환경변수 이름'
+# http_headers       = { "X-Client" = "codex" }
+
+# ── Lifecycle hooks (신흥 기능) ─────────────────────────────
+# config.toml 인라인 [hooks] 또는 별도 hooks.json 중 택1 (둘 다 두면 경고).
+# 별도 파일 예시는 examples/hooks/hooks.json 참고.
+# [[hooks.PreToolUse]]
+# matcher = "^Bash$"
+# [[hooks.PreToolUse.hooks]]
+# type = "command"
+# command = '/usr/bin/python3 "$(git rev-parse --show-toplevel)/.codex/hooks/guard-bash.py"'
+# timeout = 10
+# statusMessage = "Bash 명령 검사 중"

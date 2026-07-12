@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://ihan0316.github.io/codex-code-toolkit/sitemap.xml
