@@ -434,7 +434,12 @@
       var href = a.getAttribute("href"); if (!href) return;
       if (/^https?:/i.test(href)) { a.target = "_blank"; a.rel = "noopener"; return; }
       if (href.charAt(0) === "#") return;
-      if (/README\.md(#.*)?$/i.test(href)) { a.setAttribute("href", "#/home"); return; }
+      // README는 랜딩(#/home)이 아니라 '전체 개요' 페이지다 — 문서 하단의 "목차" 링크가 여기로 온다
+      if (/README\.md(#.*)?$/i.test(href)) {
+        var frag = (href.match(/#(.*)$/) || [])[1];
+        a.setAttribute("href", "#/overview" + (frag ? "#" + frag : ""));
+        return;
+      }
       var md = href.match(/(?:^|\/)(\d\d-[a-z0-9-]+)\.md(#[^)]*)?$/i);
       if (md) { a.setAttribute("href", "#/" + md[1] + (md[2] || "")); return; }
       var clean = href.replace(/^(\.\.\/)+/, "").replace(/^\.\//, "");
@@ -444,11 +449,76 @@
     return toc;
   }
 
+  /* 문서 페이지를 랜딩과 같은 리듬으로 — 콘텐츠(md)는 그대로 두고 렌더 단계에서만 손본다 */
+  var LEAD_EMOJI = /^\s*[\p{Extended_Pictographic}️‍0-9⃣]+\s*/u;
+  function stripLeadEmoji(s) { return String(s).replace(LEAD_EMOJI, "").trim() || String(s).trim(); }
+
+  function polishDoc(root, item) {
+    // (1) h1 위에 소속 그룹 라벨 — 사이드바에서 어디 있는 문서인지 바로 보인다
+    var h1 = root.querySelector("h1");
+    if (h1 && item) {
+      var group = "", seen = "";
+      for (var i = 0; i < NAV.length; i++) {
+        if (NAV[i].g) seen = NAV[i].g;
+        if (NAV[i].id === item.id) { group = seen; break; }
+      }
+      if (group) {
+        var eb = document.createElement("div");
+        eb.className = "doc-eyebrow";
+        eb.innerHTML = escapeHtml(group) + (item.num && item.num !== "~" ? ' <span>' + escapeHtml(item.num) + "</span>" : "");
+        h1.parentNode.insertBefore(eb, h1);
+      }
+    }
+
+    // (2) 제목 바로 뒤 인용문은 이 문서의 리드 — 본문보다 크게
+    if (h1) {
+      var next = h1.nextElementSibling;
+      if (next && next.tagName === "BLOCKQUOTE" && !next.classList.contains("callout")) {
+        next.classList.add("doc-lead");
+      }
+    }
+
+    // (3) md 하단의 이전/목차/다음 줄은 GitHub용 — 사이트에는 사이드바와 페이저가 이미 있다
+    root.querySelectorAll('div[align="center"]').forEach(function (d) {
+      var links = d.querySelectorAll("a");
+      if (!links.length) return;
+      var txt = d.textContent.replace(/\s+/g, "");
+      if (links.length <= 3 && /(이전|다음|목차)/.test(txt) && txt.length < 90) d.classList.add("doc-nav");
+    });
+
+    // (4) README에는 GitHub에서만 쓸모 있는 것들이 있다 — 사이트에서는 감춘다.
+    //     배지 줄, "웹으로 보기"(지금 보고 있는 그 사이트), 문서 목차(오른쪽 TOC와 중복).
+    if (item && item.id === "overview") {
+      root.querySelectorAll('img[src*="shields.io"]').forEach(function (img) {
+        var p = img.closest("p"); if (p) p.classList.add("doc-hide");
+      });
+      root.querySelectorAll("h3").forEach(function (h) {
+        var a = h.querySelector('a[href*="ihan0316.github.io"], a[href*="github.io"]');
+        if (!a) return;
+        h.classList.add("doc-hide");
+        var n = h.nextElementSibling;
+        if (n && n.tagName === "P") n.classList.add("doc-hide");
+      });
+      root.querySelectorAll("h2").forEach(function (h) {
+        if (!/목차/.test(h.textContent)) return;
+        h.classList.add("doc-hide");
+        var n = h.nextElementSibling;
+        while (n && (n.tagName === "UL" || n.tagName === "OL")) { n.classList.add("doc-hide"); n = n.nextElementSibling; }
+        if (n && n.tagName === "HR") n.classList.add("doc-hide");
+      });
+    }
+  }
+
   function buildTOC(toc) {
-    if (!toc.length) { tocEl.innerHTML = ""; return; }
+    var items = toc.filter(function (t) {
+      var el = document.getElementById(t.id);          // 화면에서 감춘 제목은 목차에도 넣지 않는다
+      return el && !el.classList.contains("doc-hide") && !el.closest(".doc-hide, .doc-nav");
+    });
+    if (!items.length) { tocEl.innerHTML = ""; return; }
     var html = '<div class="toc-title">이 페이지</div>';
-    toc.forEach(function (t) {
-      html += '<a href="#' + t.id + '" class="' + (t.lvl === 3 ? "lvl3" : "") + '" data-tid="' + t.id + '">' + escapeHtml(t.text) + "</a>";
+    items.forEach(function (t) {
+      // 목차에서는 제목 앞 이모지를 뗀다 — 좁은 폭에서 글머리가 들쭉날쭉해 보인다
+      html += '<a href="#' + t.id + '" class="' + (t.lvl === 3 ? "lvl3" : "") + '" data-tid="' + t.id + '">' + escapeHtml(stripLeadEmoji(t.text)) + "</a>";
     });
     tocEl.innerHTML = html;
   }
@@ -495,6 +565,7 @@
       heroEl.hidden = true; heroEl.innerHTML = "";
       contentEl.innerHTML = window.marked.parse(md);
       var toc = decorate(contentEl);
+      polishDoc(contentEl, item);
       buildTOC(toc);
       buildPager(idx);
       document.title = item.title + " · Codex CLI 셋업 툴킷";
