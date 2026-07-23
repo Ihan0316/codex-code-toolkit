@@ -35,14 +35,13 @@
   };
 
   var HERO =
-    '<div class="hero-glow"></div>' +
-    '<div class="kicker"><span class="dot"></span>~/.codex · DEV SETUP TOOLKIT</div>' +
+    '<div class="kicker">~/.codex · DEV SETUP TOOLKIT</div>' +
     '<h1 class="hero-title">Codex CLI<br><span class="grad">실전 셋업 툴킷</span></h1>' +
     '<p class="hero-sub">실무에서 매일 쓰며 다듬은 AGENTS.md · 샌드박스 · 훅 · MCP · 자동화 모음. ' +
     '단순 "이렇게 하세요"가 아니라 — <strong>무엇을 / 왜 썼고 / 무엇이 좋아졌는지</strong>까지.</p>' +
     '<div class="hero-cta">' +
-      '<a class="btn btn-primary" href="#/00-quickstart">빠른 시작 →</a>' +
-      '<a class="btn btn-ghost" href="https://github.com/' + REPO + '" target="_blank" rel="noopener">GitHub ↗</a>' +
+      '<a class="btn btn-primary" href="#/00-quickstart">빠른 시작</a>' +
+      '<a class="btn btn-ghost" href="https://github.com/' + REPO + '" target="_blank" rel="noopener">GitHub 저장소</a>' +
     '</div>' +
     '<div class="hero-stats">' +
       '<div class="stat"><b>12</b><span>문서</span></div>' +
@@ -62,9 +61,8 @@
   var overlay = document.getElementById("overlay");
   var cache = {};
   var mermaidReady = null;
-  var CAN_TILT = !!(window.matchMedia &&
-    window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  // 한글 완비 폰트 우선 — SVG <text> 라벨이 한글 글리프를 바로 그린다
+  var MERMAID_FONT = '"Pretendard Variable", Pretendard, system-ui, -apple-system, "Malgun Gothic", sans-serif';
 
   function slugify(text) {
     // GitHub 호환: 공백을 개별 하이픈으로(붕괴 금지) — '—'·'&'·'/' 제거 후 남는 이중 공백이 이중 하이픈이 됨
@@ -95,20 +93,20 @@
             //     mermaid의 foreignObject HTML 라벨은 Chromium에서 한글 자모가 깨진다
             //     (단일행 라벨: "경계 위반"→"겨게 이바"). SVG <text>는 정상 렌더됨(확인 완료).
             // (2) fontFamily는 한글 완비 폰트(Pretendard) — SVG <text>가 한글 글리프를 바로 그림.
-            fontFamily: "Pretendard, system-ui, -apple-system, 'Malgun Gothic', sans-serif",
+            fontFamily: MERMAID_FONT,
             htmlLabels: false,
             flowchart: { htmlLabels: false },
             themeVariables: {
               background: "transparent",
               // SVG <text>(엣지 라벨·시퀀스 다이어그램)에 실제 적용되는 폰트 — 한글 완비 폰트 필수.
               // 이걸 안 주면 mermaid 기본값(trebuchet ms)이 적용돼 한글이 깨진다.
-              fontFamily: "Pretendard, system-ui, -apple-system, 'Malgun Gothic', sans-serif",
-              primaryColor: dark ? "#12241e" : "#e6f6f0",
-              primaryBorderColor: "#10a37f",
-              primaryTextColor: dark ? "#e9ecf5" : "#161b27",
-              lineColor: dark ? "#2f81f7" : "#7a86c8",
-              secondaryColor: dark ? "#171b28" : "#f3f5fc",
-              tertiaryColor: dark ? "#11141f" : "#f7f8fc",
+              fontFamily: MERMAID_FONT,
+              primaryColor: dark ? "#1d1d1f" : "#f5f5f7",
+              primaryBorderColor: dark ? "#48484a" : "#d2d2d7",
+              primaryTextColor: dark ? "#f5f5f7" : "#1d1d1f",
+              lineColor: dark ? "#86868b" : "#a1a1a6",
+              secondaryColor: dark ? "#161617" : "#fbfbfd",
+              tertiaryColor: dark ? "#0a0a0a" : "#ffffff",
               fontSize: "14px"
             }
           });
@@ -118,6 +116,20 @@
       })();
     });
     return mermaidReady;
+  }
+
+  // mermaid 11 + htmlLabels:false는 라벨을 HTML-escape한 뒤 SVG <text>에 넣는다.
+  // 그래서 "A & B"가 화면에 "A &amp; B"로 보인다 (입력을 #38;/#amp;/&amp; 어느 표기로 줘도 동일).
+  // 렌더가 끝난 뒤 텍스트 노드에서 엔티티를 되돌린다 — 텍스트 노드라 마크업으로 해석될 여지가 없다.
+  var ENTITY = { "&amp;": "&", "&lt;": "<", "&gt;": ">", "&quot;": '"', "&#39;": "'", "&#38;": "&" };
+  function unescapeMermaidLabels() {
+    contentEl.querySelectorAll(".mermaid svg text, .mermaid svg tspan").forEach(function (t) {
+      if (t.childElementCount) return;             // 자식 tspan이 있으면 그쪽에서 처리
+      var s = t.textContent;
+      if (s.indexOf("&") < 0) return;
+      var next = s.replace(/&(amp|lt|gt|quot|#39|#38);/g, function (m) { return ENTITY[m]; });
+      if (next !== s) t.textContent = next;
+    });
   }
 
   // On narrow screens mermaid fits diagrams to container width, shrinking text to ~30% (illegible).
@@ -191,7 +203,7 @@
       var lang = (String(code.className).match(/language-([\w-]+)/) || [])[1] || "code";
       var wrap = document.createElement("div"); wrap.className = "code-block";
       var head = document.createElement("div"); head.className = "code-head";
-      head.innerHTML = '<span class="code-dots"><i></i><i></i><i></i></span><span class="code-lang">' + escapeHtml(lang) + '</span><button class="code-copy" type="button">복사</button>';
+      head.innerHTML = '<span class="code-lang">' + escapeHtml(lang) + '</span><button class="code-copy" type="button">복사</button>';
       pre.parentNode.insertBefore(wrap, pre);
       wrap.appendChild(head); wrap.appendChild(pre);
       var btn = head.querySelector(".code-copy");
@@ -299,14 +311,19 @@
         var nodes = contentEl.querySelectorAll(".mermaid");
         if (!nodes.length) return;
         // 다이어그램 렌더 후 문서 높이가 바뀌므로 앵커로 재스크롤 (70ms 초기 스크롤이 어긋남 보정)
-        try { Promise.resolve(mm.run({ nodes: nodes })).then(fitMermaidMobile, fitMermaidMobile).then(function () { if (anchor) scrollToAnchor(); }); }
-        catch (e) { fitMermaidMobile(); if (anchor) scrollToAnchor(); }
+        // mermaid는 run() resolve 이후에도 라벨 tspan을 다시 만지므로 한 프레임 뒤 한 번 더 훑는다
+        function afterRender() {
+          unescapeMermaidLabels(); fitMermaidMobile();
+          requestAnimationFrame(unescapeMermaidLabels);
+          setTimeout(unescapeMermaidLabels, 200);
+        }
+        try { Promise.resolve(mm.run({ nodes: nodes })).then(afterRender, afterRender).then(function () { if (anchor) scrollToAnchor(); }); }
+        catch (e) { afterRender(); if (anchor) scrollToAnchor(); }
       });
       if (anchor) { setTimeout(scrollToAnchor, 70); }
       else { window.scrollTo(0, 0); }
       setupScrollSpy(toc);
       updateProgress();
-      setupTilt(isHome);
     }).catch(function (err) {
       heroEl.hidden = true;
       contentEl.innerHTML = '<div class="callout callout-caution"><div class="callout-title"><span class="ico">⛔</span><span>불러오기 실패</span></div><p>' +
@@ -355,16 +372,21 @@
   /* ---- search ---- */
   function setupSearch() {
     var input = document.getElementById("search");
-    input.addEventListener("input", function () {
+    function apply() {
       var q = input.value.trim().toLowerCase();
       navEl.querySelectorAll("a").forEach(function (a) {
         a.classList.toggle("hidden", !!q && a.textContent.toLowerCase().indexOf(q) < 0);
       });
+    }
+    input.addEventListener("input", apply);
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") { input.value = ""; apply(); input.blur(); }
     });
     document.addEventListener("keydown", function (e) {
       if (e.key === "/" && document.activeElement !== input && !/^(input|textarea)$/i.test((document.activeElement || {}).tagName || "")) {
         e.preventDefault(); input.focus();
       }
+      if (e.key === "Escape" && sidebar.classList.contains("open")) closeMenu();
     });
   }
 
@@ -388,8 +410,13 @@
   }
   function syncThemeUI() {
     var dark = currentTheme() === "dark";
+    // theme-color starts media-scoped (no-JS fallback); once JS owns the theme, pin it to the chosen one
+    document.head.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
+      m.removeAttribute("media");
+      m.setAttribute("content", dark ? "#000000" : "#fbfbfd");
+    });
     document.getElementById("hljs-theme").href =
-      "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github-" + (dark ? "dark" : "") + ".min.css";
+      "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/" + (dark ? "github-dark" : "xcode") + ".min.css";
   }
 
   /* ---- per-route meta (SEO; helps JS-rendering crawlers) ---- */
@@ -414,39 +441,6 @@
     var canon = document.head.querySelector('link[rel="canonical"]');
     if (!canon) { canon = document.createElement("link"); canon.setAttribute("rel", "canonical"); document.head.appendChild(canon); }
     canon.setAttribute("href", location.origin + location.pathname + (isHome ? "" : location.hash));
-  }
-
-  /* ---- subtle 3D tilt (presentation) ---- */
-  function addTilt(el, max) {
-    if (!el || el.__tilt) return; el.__tilt = true;
-    el.classList.add("tilt");
-    if (getComputedStyle(el).position === "static") el.style.position = "relative";
-    var glare = document.createElement("span"); glare.className = "tilt-glare"; el.appendChild(glare);
-    el.addEventListener("pointermove", function (e) {
-      var r = el.getBoundingClientRect();
-      var px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
-      el.style.transform = "perspective(680px) rotateX(" + (-py * max).toFixed(2) + "deg) rotateY(" + (px * max).toFixed(2) + "deg) translateZ(10px)";
-      glare.style.background = "radial-gradient(circle at " + ((px + .5) * 100).toFixed(1) + "% " + ((py + .5) * 100).toFixed(1) + "%, rgba(255,255,255,.16), transparent 55%)";
-    });
-    el.addEventListener("pointerleave", function () { el.style.transform = ""; glare.style.background = "none"; });
-  }
-  function heroParallax() {
-    var glow = heroEl.querySelector(".hero-glow"), title = heroEl.querySelector(".hero-title");
-    heroEl.addEventListener("pointermove", function (e) {
-      var r = heroEl.getBoundingClientRect();
-      var px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
-      if (glow) glow.style.transform = "translate(" + (px * 32).toFixed(1) + "px," + (py * 22).toFixed(1) + "px)";
-      if (title) title.style.transform = "perspective(900px) rotateX(" + (-py * 5).toFixed(2) + "deg) rotateY(" + (px * 6).toFixed(2) + "deg)";
-    });
-    heroEl.addEventListener("pointerleave", function () {
-      if (glow) glow.style.transform = ""; if (title) title.style.transform = "";
-    });
-  }
-  function setupTilt(isHome) {
-    if (!CAN_TILT) return;
-    if (isHome) { heroEl.querySelectorAll(".stat").forEach(function (e) { addTilt(e, 9); }); heroParallax(); }
-    contentEl.querySelectorAll("table.layout-cards td").forEach(function (e) { addTilt(e, 7); });
-    pagerEl.querySelectorAll("a").forEach(function (e) { addTilt(e, 5); });
   }
 
   /* ---- mobile menu ---- */
