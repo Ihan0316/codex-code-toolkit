@@ -7,7 +7,8 @@
 
   var NAV = [
     { g: "시작하기" },
-    { id: "home", file: "README.md", title: "전체 개요", num: "~" },
+    { id: "home", landing: true, title: "홈", num: "◎" },
+    { id: "overview", file: "README.md", title: "전체 개요", num: "~" },
     { id: "00-quickstart", file: "docs/00-quickstart.md", title: "빠른 시작", num: "00" },
     { g: "핵심" },
     { id: "01-sandbox-approvals", file: "docs/01-sandbox-approvals.md", title: "샌드박스·승인·훅", num: "01" },
@@ -34,22 +35,203 @@
     CAUTION:   { icon: "⛔", label: "경고" }
   };
 
-  var HERO =
-    '<div class="kicker">~/.codex · DEV SETUP TOOLKIT</div>' +
-    '<h1 class="hero-title">Codex CLI<br><span class="grad">실전 셋업 툴킷</span></h1>' +
-    '<p class="hero-sub">실무에서 매일 쓰며 다듬은 AGENTS.md · 샌드박스 · 훅 · MCP · 자동화 모음. ' +
-    '단순 "이렇게 하세요"가 아니라 — <strong>무엇을 / 왜 썼고 / 무엇이 좋아졌는지</strong>까지.</p>' +
-    '<div class="hero-cta">' +
-      '<a class="btn btn-primary" href="#/00-quickstart">빠른 시작</a>' +
-      '<a class="btn btn-ghost" href="https://github.com/' + REPO + '" target="_blank" rel="noopener">GitHub 저장소</a>' +
-    '</div>' +
-    '<div class="hero-stats">' +
-      '<div class="stat"><b>12</b><span>문서</span></div>' +
-      '<div class="stat"><b>3</b><span>샌드박스 모드</span></div>' +
-      '<div class="stat"><b>10</b><span>훅 이벤트</span></div>' +
-      '<div class="stat"><b>20</b><span>다이어그램</span></div>' +
-      '<div class="stat"><b>0</b><span>비밀 유출</span></div>' +
-    '</div>';
+  /* ================= 랜딩 페이지 데이터 ================= */
+  var L = {
+    kicker: "~/.codex · DEV SETUP TOOLKIT",
+    titleTop: "Codex CLI를",
+    titleAccent: "손에 맞게 길들이기",
+    sub: '실무에서 매일 쓰며 다듬은 AGENTS.md · 샌드박스 · 훅 · MCP · 자동화 모음. ' +
+         '단순 "이렇게 하세요"가 아니라 — <b>무엇을 / 왜 썼고 / 무엇이 좋아졌는지</b>까지.',
+    stats: [
+      { n: 12, s: "문서" }, { n: 3, s: "샌드박스 모드" }, { n: 10, s: "훅 이벤트" },
+      { n: 20, s: "다이어그램" }, { n: 0, s: "비밀 유출" }
+    ],
+    principles: [
+      { n: "01", t: "실수는 시스템이 막는다",
+        d: "사람의 주의력에 기대지 않습니다. 워크스페이스 밖 쓰기·네트워크는 샌드박스가 기본 차단하고, 위험한 명령은 PreToolUse 훅이 자동 검사합니다." },
+      { n: "02", t: "맥락은 기억하게 만든다",
+        d: '매번 "나는 이런 사람이고 이 프로젝트는…"을 다시 설명하지 않도록 AGENTS.md 계층 · /memories · SessionStart 훅으로 자동 주입.' },
+      { n: "03", t: "반복은 자동화한다",
+        d: "일간/주간 보고와 설정 백업을 codex exec + cron에 위임. 안 하면 서서히 망가지는 일을 시스템에 맡깁니다." }
+    ],
+    features: [
+      { k: "안전", t: "샌드박스 · 승인 · 훅 3중 방어", id: "01-sandbox-approvals",
+        d: "워크스페이스 밖 쓰기와 네트워크는 승인을 거치고, 위험 명령은 lifecycle 훅이 실행 전에 막습니다.",
+        tags: ["read-only", "workspace-write", "PreToolUse"] },
+      { k: "스킬", t: "검증된 절차를 한마디로", id: "02-skills",
+        d: '작업별 전문 절차를 캡슐화한 SKILL.md 모듈. "일일 보고 만들어줘" 한마디에 같은 품질의 절차가 적용됩니다.',
+        tags: ["SKILL.md", "번들", "자동 트리거"] },
+      { k: "메모리", t: "세션이 바뀌어도 잊지 않는다", id: "03-memory",
+        d: "계층형 AGENTS.md와 /memories 영속 기억. 글로벌 기본값과 레포별 규약을 분리해 쌓습니다.",
+        tags: ["AGENTS.md", "/memories", "계층"] },
+      { k: "자동 루틴", t: "헤드리스로 알아서 돈다", id: "04-automation",
+        d: "codex exec·cron·notify로 일간·주간 보고를 자동화하고, 턴 완료를 외부로 알립니다.",
+        tags: ["codex exec", "cron", "notify"] },
+      { k: "MCP", t: "외부 시스템을 직접 조작", id: "05-mcp",
+        d: "노션·피그마·문서검색을 Codex가 직접 다룹니다. 복붙 왕복이 사라집니다.",
+        tags: ["Notion", "Figma", "Docs"] },
+      { k: "추론 강도", t: "난제엔 깊게, 반복엔 얕게", id: "06-reasoning-context",
+        d: "model_reasoning_effort와 /compact로 토큰과 정확도를 상황에 맞게 조절합니다.",
+        tags: ["effort", "/compact", "context"] }
+    ],
+    steps: [
+      { n: 1, t: "AGENTS.md 글로벌 지침", e: 3, lv: "쉬움", id: "00-quickstart" },
+      { n: 2, t: "샌드박스·승인 프리셋", e: 3, lv: "쉬움", id: "01-sandbox-approvals" },
+      { n: 3, t: "메모리 & AGENTS.md 계층", e: 3, lv: "중간", id: "03-memory" },
+      { n: 4, t: "PreToolUse 위험명령 훅", e: 2, lv: "중간", id: "01-sandbox-approvals" },
+      { n: 5, t: "SessionStart 컨텍스트 훅", e: 2, lv: "중간", id: "01-sandbox-approvals" },
+      { n: 6, t: "스킬 설치", e: 2, lv: "쉬움", id: "02-skills" }
+    ],
+    codeTitle: "~/.codex/config.toml",
+    codeCap: "두 줄이면 워크스페이스 밖 쓰기와 네트워크가 기본으로 막힙니다.",
+    code: [
+      "# 안전 — 승인 + 샌드박스",
+      'approval_policy = "on-request"',
+      'sandbox_mode   = "workspace-write"',
+      "",
+      "[sandbox_workspace_write]",
+      "network_access = false        # 네트워크는 기본 차단",
+      "",
+      "# 읽기 전용 프로필 — codex --profile readonly",
+      "[profiles.readonly]",
+      'approval_policy = "untrusted"',
+      'sandbox_mode    = "read-only"'
+    ].join("\n")
+  };
+
+  function esc(s) { return escapeHtml(s); }
+
+  function landingHTML() {
+    var h = "";
+
+    h += '<section class="lp-hero">' +
+      '<div class="lp-kicker">' + esc(L.kicker) + '</div>' +
+      '<h1 class="lp-title">' + esc(L.titleTop) + '<br><span class="grad">' + esc(L.titleAccent) + '</span></h1>' +
+      '<p class="lp-sub">' + L.sub + '</p>' +
+      '<div class="lp-cta">' +
+        '<a class="btn btn-primary" href="#/00-quickstart">10분 만에 시작</a>' +
+        '<a class="btn btn-ghost" href="https://github.com/' + REPO + '" target="_blank" rel="noopener">GitHub 저장소</a>' +
+      '</div>' +
+      '<div class="lp-stats">' +
+        L.stats.map(function (s) {
+          return '<div class="lp-stat"><b data-count="' + s.n + '">0</b><span>' + esc(s.s) + '</span></div>';
+        }).join("") +
+      '</div>' +
+      '<div class="lp-scroll" aria-hidden="true"><span></span></div>' +
+    '</section>';
+
+    h += '<section class="lp-sec reveal">' +
+      '<div class="lp-eyebrow">설계 원칙</div>' +
+      '<h2 class="lp-h2">왜 이렇게 짰나</h2>' +
+      '<p class="lp-lead">Codex는 기본만 써도 강력하지만, 반복 업무 · 실수 방지 · 맥락 유지는 직접 손봐야 합니다.</p>' +
+      '<div class="lp-principles">' +
+        L.principles.map(function (p) {
+          return '<div class="lp-principle"><span class="lp-num">' + p.n + '</span>' +
+                 '<h3>' + esc(p.t) + '</h3><p>' + esc(p.d) + '</p></div>';
+        }).join("") +
+      '</div>' +
+    '</section>';
+
+    h += '<section class="lp-sec reveal">' +
+      '<div class="lp-eyebrow">구성</div>' +
+      '<h2 class="lp-h2">여섯 개의 축</h2>' +
+      '<p class="lp-lead">샌드박스와 훅이 안전을 맡고, 스킬·메모리·MCP가 능력과 기억을 확장하고, 루틴·추론 강도 조절이 반복과 비용을 다룹니다.</p>' +
+      '<div class="lp-grid">' +
+        L.features.map(function (f) {
+          return '<a class="lp-card" href="#/' + f.id + '">' +
+            '<div class="lp-card-k">' + esc(f.k) + '</div>' +
+            '<h3>' + esc(f.t) + '</h3>' +
+            '<p>' + esc(f.d) + '</p>' +
+            '<div class="lp-tags">' + f.tags.map(function (t) { return '<span>' + esc(t) + '</span>'; }).join("") + '</div>' +
+            '<span class="lp-card-go" aria-hidden="true">자세히 →</span>' +
+          '</a>';
+        }).join("") +
+      '</div>' +
+    '</section>';
+
+    h += '<section class="lp-sec reveal">' +
+      '<div class="lp-eyebrow">두 줄이면 충분</div>' +
+      '<h2 class="lp-h2">config.toml 두 줄</h2>' +
+      '<p class="lp-lead">' + esc(L.codeCap) + '</p>' +
+      '<div class="lp-code">' +
+        '<div class="lp-code-head"><span>' + esc(L.codeTitle) + '</span></div>' +
+        '<pre><code class="language-toml">' + esc(L.code) + '</code></pre>' +
+      '</div>' +
+    '</section>';
+
+    h += '<section class="lp-sec reveal">' +
+      '<div class="lp-eyebrow">도입 순서</div>' +
+      '<h2 class="lp-h2">위에서부터 차례로</h2>' +
+      '<p class="lp-lead">앞 3개만 켜도 매일의 체감이 바뀝니다. 전부 켤 필요는 없습니다. ' +
+      '오른쪽 막대는 체감 효과, 그 옆은 난이도입니다.</p>' +
+      '<ol class="lp-steps">' +
+        L.steps.map(function (s) {
+          var stars = "";
+          for (var i = 0; i < 3; i++) stars += '<i class="' + (i < s.e ? "on" : "") + '"></i>';
+          return '<li><a href="#/' + s.id + '">' +
+            '<span class="lp-step-n">' + s.n + '</span>' +
+            '<span class="lp-step-t">' + esc(s.t) + '</span>' +
+            '<span class="lp-step-e" title="체감 효과">' + stars + '</span>' +
+            '<span class="lp-step-lv">' + esc(s.lv) + '</span>' +
+          '</a></li>';
+        }).join("") +
+      '</ol>' +
+      '<p class="lp-more"><a href="#/overview">전체 10단계와 커버리지 맵 보기 →</a></p>' +
+    '</section>';
+
+    h += '<section class="lp-final reveal">' +
+      '<h2>10분이면 핵심 3개를 켤 수 있습니다.</h2>' +
+      '<p>설치 순서, 각 항목이 무엇을 막아 주는지, 실패했을 때 무엇을 보면 되는지까지 문서에 있습니다.</p>' +
+      '<div class="lp-cta">' +
+        '<a class="btn btn-primary" href="#/00-quickstart">빠른 시작 열기</a>' +
+        '<a class="btn btn-ghost" href="#/overview">전체 개요</a>' +
+      '</div>' +
+    '</section>';
+
+    return h;
+  }
+
+  /* 스크롤 진입 애니메이션 + 숫자 카운트업 */
+  var revealObs = null;
+  function setupLanding() {
+    if (window.hljs) {
+      contentEl.querySelectorAll(".lp-code pre code").forEach(function (c) {
+        try { window.hljs.highlightElement(c); } catch (e) {}
+      });
+    }
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var items = contentEl.querySelectorAll(".reveal");
+    if (reduce || !("IntersectionObserver" in window)) {
+      items.forEach(function (el) { el.classList.add("in"); });
+      countUp(true);
+      return;
+    }
+    if (revealObs) revealObs.disconnect();
+    revealObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        en.target.classList.add("in");
+        revealObs.unobserve(en.target);
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.08 });
+    items.forEach(function (el) { revealObs.observe(el); });
+    countUp(false);
+  }
+
+  function countUp(instant) {
+    contentEl.querySelectorAll(".lp-stat b[data-count]").forEach(function (el) {
+      var target = parseInt(el.getAttribute("data-count"), 10) || 0;
+      if (instant || target === 0) { el.textContent = String(target); return; }
+      var dur = 900, t0 = null;
+      function step(ts) {
+        if (t0 === null) t0 = ts;
+        var p = Math.min(1, (ts - t0) / dur);
+        el.textContent = String(Math.round(target * (1 - Math.pow(1 - p, 3))));   // easeOutCubic
+        if (p < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    });
+  }
 
   var contentEl = document.getElementById("content");
   var heroEl = document.getElementById("hero");
@@ -279,30 +461,44 @@
   }
 
   /* ---- load + route ---- */
+  // 항상 최신 문서를 받는다: 세션 내에서만 메모리 캐시를 쓰고, 네트워크는 no-store + 캐시버스터.
   function fetchDoc(file) {
     if (cache[file]) return Promise.resolve(cache[file]);
-    return fetch(file, { cache: "no-cache" }).then(function (r) {
+    var url = file + (file.indexOf("?") < 0 ? "?" : "&") + "t=" + Date.now();
+    return fetch(url, { cache: "no-store" }).then(function (r) {
       if (!r.ok) throw new Error(r.status + " " + file);
       return r.text();
     }).then(function (t) { cache[file] = t; return t; });
   }
 
+  function renderLanding(item, idx) {
+    heroEl.hidden = true; heroEl.innerHTML = "";
+    contentEl.innerHTML = landingHTML();
+    contentEl.classList.add("landing");
+    tocEl.innerHTML = "";
+    pagerEl.innerHTML = "";   // 랜딩 끝에 이미 CTA가 있다 — 한쪽만 찬 페이저는 비대칭
+
+    document.title = "Codex CLI 실전 셋업 툴킷";
+    updateMeta(item, true);
+    contentEl.classList.remove("enter"); void contentEl.offsetWidth; contentEl.classList.add("enter");
+    window.scrollTo(0, 0);
+    setupLanding();
+    updateProgress();
+    return Promise.resolve();
+  }
+
   function renderDoc(item, idx, anchor) {
-    var isHome = item.id === "home";
+    if (item.landing) return renderLanding(item, idx);
+    contentEl.classList.remove("landing");
     contentEl.innerHTML = '<div class="loading"><span class="spin"></span> 불러오는 중…</div>';
     return fetchDoc(item.file).then(function (md) {
-      if (isHome) {
-        heroEl.innerHTML = HERO; heroEl.hidden = false;
-        md = md.replace(/^[\s\S]*?\n---\n/, ""); // strip README's centered header (now in hero)
-      } else {
-        heroEl.hidden = true; heroEl.innerHTML = "";
-      }
+      heroEl.hidden = true; heroEl.innerHTML = "";
       contentEl.innerHTML = window.marked.parse(md);
       var toc = decorate(contentEl);
       buildTOC(toc);
       buildPager(idx);
-      document.title = (isHome ? "" : item.title + " · ") + "Codex CLI 셋업 툴킷";
-      updateMeta(item, isHome);
+      document.title = item.title + " · Codex CLI 셋업 툴킷";
+      updateMeta(item, false);
       // re-trigger enter animation
       contentEl.classList.remove("enter"); void contentEl.offsetWidth; contentEl.classList.add("enter");
       function scrollToAnchor() { var el = document.getElementById(anchor); if (el) el.scrollIntoView(); }

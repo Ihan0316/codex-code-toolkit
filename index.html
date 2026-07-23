@@ -10,11 +10,16 @@
 <meta property="og:type" content="website" />
 <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>" />
 <link rel="preconnect" href="https://cdn.jsdelivr.net" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
 <link id="hljs-theme" rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github-dark.min.css" />
-<link rel="stylesheet" href="assets/app.css?v=20260723" /><!-- 변경 배포 시 v 갱신 -->
+<!-- 에셋은 매 방문마다 새로 받는다: 로드 시각을 쿼리로 붙여 브라우저·CDN 캐시를 우회.
+     head에서 동기 삽입해야 스타일 적용 전 화면이 번쩍이지 않는다. -->
+<script>window.__V = "?v=" + Date.now(); document.write('<link rel="stylesheet" href="assets/app.css' + window.__V + '">');</script>
 </head>
 <body>
 <div id="progress" class="scroll-progress" aria-hidden="true"></div>
@@ -71,6 +76,6 @@
 import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.4.1/dist/mermaid.esm.min.mjs";
 window.__mermaid = mermaid;
 </script>
-<script src="assets/app.js?v=20260723"></script><!-- 변경 배포 시 v 갱신 -->
+<script>document.write('<script src="assets/app.js' + window.__V + '"><\/script>');</script>
 </body>
 </html>
