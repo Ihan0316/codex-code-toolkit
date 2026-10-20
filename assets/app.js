@@ -832,7 +832,7 @@
     });
     document.addEventListener("keydown", function (e) {
       if (e.key === "/" && document.activeElement !== input && !/^(input|textarea)$/i.test((document.activeElement || {}).tagName || "")) {
-        e.preventDefault(); input.focus();
+        e.preventDefault(); if (sidebar.contains(input) && sidebar.inert) openMenu(); input.focus();
       }
       if (e.key === "Escape" && sidebar.classList.contains("open")) closeMenu();
     });
@@ -892,13 +892,41 @@
   }
 
   /* ---- mobile menu ---- */
-  function openMenu() { sidebar.classList.add("open"); overlay.hidden = false; }
-  function closeMenu() { sidebar.classList.remove("open"); overlay.hidden = true; }
+  function syncMenu() {
+    var mobile = window.matchMedia("(max-width: 900px)").matches;
+    var open = sidebar.classList.contains("open");
+    sidebar.inert = mobile && !open;
+    if (mobile && !open) sidebar.setAttribute("aria-hidden", "true");
+    else sidebar.removeAttribute("aria-hidden");
+    document.getElementById("menuBtn").setAttribute("aria-expanded", String(mobile && open));
+    overlay.hidden = !mobile || !open;
+  }
+  function openMenu() {
+    sidebar.classList.add("open");
+    syncMenu();
+    var first = sidebar.querySelector("input, a, button");
+    if (first) first.focus();
+  }
+  function closeMenu() {
+    if (sidebar.classList.contains("open") && window.matchMedia("(max-width: 900px)").matches) {
+      document.getElementById("menuBtn").focus();
+    }
+    sidebar.classList.remove("open");
+    syncMenu();
+  }
   function setupMenu() {
     document.getElementById("menuBtn").addEventListener("click", function () {
       sidebar.classList.contains("open") ? closeMenu() : openMenu();
     });
     overlay.addEventListener("click", closeMenu);
+    var mq = window.matchMedia("(max-width: 900px)");
+    function resizeMenu() {
+      if (!mq.matches) sidebar.classList.remove("open");
+      syncMenu();
+    }
+    if (mq.addEventListener) mq.addEventListener("change", resizeMenu);
+    else if (mq.addListener) mq.addListener(resizeMenu);
+    syncMenu();
   }
 
   /* ---- responsive search: 좁은 화면(<=560px)에선 검색을 드로어(사이드바)로 이동해 접근 가능하게 ---- */
@@ -919,6 +947,16 @@
 
   /* ---- boot ---- */
   function boot() {
+    if (!window.marked || typeof window.marked.parse !== "function" || typeof window.marked.setOptions !== "function") {
+      heroEl.hidden = true;
+      contentEl.innerHTML = '<div class="callout callout-warning" role="alert">' +
+        '<h1>문서를 불러오지 못했습니다</h1>' +
+        '<p>문서 표시 도구를 불러올 수 없습니다. 연결을 확인하고 다시 시도하거나 GitHub에서 문서를 읽으세요.</p>' +
+        '<p><button id="loadRetry" type="button" class="code-copy">다시 시도</button> ' +
+        '<a href="https://github.com/' + REPO + '/blob/main/README.md">GitHub 문서 열기 ↗</a></p></div>';
+      document.getElementById("loadRetry").addEventListener("click", function () { location.reload(); });
+      return;
+    }
     window.marked.setOptions({ gfm: true, breaks: false });
     buildNav(); setupSearch(); setupTheme(); setupMenu(); setupResponsiveSearch();
     window.addEventListener("hashchange", function () { if ((location.hash || "").indexOf("#/") === 0) route(); });
