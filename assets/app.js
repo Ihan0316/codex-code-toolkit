@@ -23,7 +23,8 @@
     { id: "09-subagents", file: "docs/09-subagents.md", title: "서브에이전트", num: "09" },
     { g: "레퍼런스" },
     { id: "10-ecosystem", file: "docs/10-ecosystem.md", title: "확장 생태계", num: "10" },
-    { id: "11-inventory", file: "docs/11-inventory.md", title: "전체 인벤토리", num: "11" }
+    { id: "11-inventory", file: "docs/11-inventory.md", title: "전체 인벤토리", num: "11" },
+    { id: "12-claude-parity", file: "docs/12-claude-parity.md", title: "Claude 설정 호환", num: "12" }
   ];
 
   var PAGES = NAV.filter(function (n) { return n.id; });
@@ -38,22 +39,22 @@
 
   /* ================= 랜딩 페이지 데이터 ================= */
   var L = {
-    kicker: "~/.codex · dev setup toolkit",
-    titleWords: ['Codex', 'CLI를', '<span class="hl">손에 맞게</span>', '길들이기'],
-    sub: '실무에서 매일 쓰며 다듬은 AGENTS.md · 샌드박스 · 훅 · MCP · 자동화. ' +
-         '단순 "이렇게 하세요"가 아니라 <b>무엇을 / 왜 썼고 / 무엇이 좋아졌는지</b>까지 적었습니다.',
+    kicker: "FIELD GUIDE / 2026.10",
+    titleWords: ['Codex를', '<span class="hl">내 작업의</span>', '방식으로.'],
+    sub: '지침부터 훅, 스킬, 반복 일정까지. ' +
+         '<b>직접 확인하고 옮겨 쓰는 Codex 셋업 가이드.</b> Windows 네이티브와 Claude 설정 이관까지 한곳에 정리했습니다.',
     stats: [
-      { n: 12, s: "docs" }, { n: 3, s: "sandbox" }, { n: 10, s: "hooks" }, { n: 0, s: "secrets" }
+      { n: 13, s: "가이드" }, { n: 12, s: "훅 정의" }, { n: 26, s: "스킬 목록" }, { n: 6, s: "중지 일정" }
     ],
-    termTitle: "codex — 세션 데모",
+    termTitle: "SETUP / 구성 예시",
     term: [
-      { t: "cmd",   s: 'codex "의존성 정리하고 커밋해줘"' },
-      { t: "run",   s: "Bash(curl https://get.tool.sh | sh)" },
-      { t: "block", s: "sandbox — 네트워크 차단 (workspace-write)" },
-      { t: "ok",    s: "승인 후 재시도 → 완료" },
-      { t: "cmd",   s: 'codex "일일 보고 만들어줘"' },
-      { t: "run",   s: "Skill(daily-report) 로드" },
-      { t: "ok",    s: "보고서 생성 완료 · 2.1s" }
+      { t: "cmd",   s: "codex /hooks" },
+      { t: "run",   s: "SessionStart → 세션 맥락" },
+      { t: "run",   s: "PreToolUse → 소유권·위험 명령 검사" },
+      { t: "ok",    s: "정의 검토 후 사용자 신뢰 승인" },
+      { t: "cmd",   s: "일정 복제 기준" },
+      { t: "run",   s: "daily-report   평일 17:40" },
+      { t: "ok",    s: "6개 모두 PAUSED · 활성화 별도 요청" }
     ],
     marquee: ["sandbox", "approvals", "AGENTS.md", "/memories", "Skills", "MCP", "codex exec", "cron", "notify", "/compact", "profiles", "Sync"],
     flow: [
@@ -72,8 +73,8 @@
         d: 'SKILL.md 모듈로 절차를 캡슐화. "일일 보고 만들어줘" 한마디면 충분합니다.' },
       { k: "MCP", t: "외부 시스템 직접 조작", id: "05-mcp",
         d: "노션·피그마·문서검색을 Codex가 직접 다룹니다. 복붙 왕복이 사라집니다." },
-      { k: "Automation", t: "헤드리스로 알아서 돈다", id: "04-automation",
-        d: "codex exec·cron·notify로 보고와 백업을 자동화합니다." },
+      { k: "Automation", t: "반복 작업도 내 통제 아래", id: "12-claude-parity",
+        d: "예약식 6개를 중지 상태로 보관하고, 실행 범위와 승인 조건을 먼저 정합니다." },
       { k: "Reasoning", t: "난제엔 깊게, 반복엔 얕게", id: "06-reasoning-context", strip: true,
         d: "model_reasoning_effort와 /compact로 토큰과 정확도를 상황에 맞게 조절합니다." }
     ],
@@ -112,8 +113,8 @@
         '</h1>' +
         '<p class="lp-sub">' + L.sub + '</p>' +
         '<div class="lp-cta">' +
-          '<a class="btn btn-primary magnet" href="#/00-quickstart">10분 만에 시작</a>' +
-          '<a class="btn btn-ghost magnet" href="https://github.com/' + REPO + '" target="_blank" rel="noopener">GitHub</a>' +
+          '<a class="btn btn-primary" href="#/00-quickstart">셋업 시작하기 ↗</a>' +
+          '<a class="btn btn-ghost" href="#/12-claude-parity">Claude 설정 맞추기 →</a>' +
         '</div>' +
         '<div class="lp-stats">' +
           L.stats.map(function (s) {
@@ -126,6 +127,11 @@
         '<div class="lp-term-body" id="lpTerm"></div>' +
       '</div>' +
     '</section>';
+
+    h += '<a class="lp-update" href="#/12-claude-parity">' +
+      '<span class="lp-update-tag">UPDATE 12</span>' +
+      '<span>Windows 네이티브 · Claude 호환 설정 <small>훅·스킬·중지 일정의 현재 기준</small></span>' +
+      '<span aria-hidden="true">↗</span></a>';
 
     /* marquee */
     var mq = L.marquee.map(function (w) { return esc(w) + ' <i>▸</i>'; }).join(" ");
@@ -836,7 +842,7 @@
   function setupTheme() {
     var saved = null; try { saved = localStorage.getItem("cdx-theme"); } catch (e) {}
     if (saved) document.documentElement.setAttribute("data-theme", saved);
-    else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches) document.documentElement.setAttribute("data-theme", "light");
+    else if (window.matchMedia) document.documentElement.setAttribute("data-theme", window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
     syncThemeUI();
     document.getElementById("themeBtn").addEventListener("click", function () {
       var next = currentTheme() === "dark" ? "light" : "dark";
@@ -855,7 +861,7 @@
     // theme-color starts media-scoped (no-JS fallback); once JS owns the theme, pin it to the chosen one
     document.head.querySelectorAll('meta[name="theme-color"]').forEach(function (m) {
       m.removeAttribute("media");
-      m.setAttribute("content", dark ? "#0a0a09" : "#fbfbf8");
+      m.setAttribute("content", dark ? "#141a23" : "#f4f2eb");
     });
     document.getElementById("hljs-theme").href =
       "https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/" + (dark ? "github-dark" : "xcode") + ".min.css";

@@ -20,3 +20,5 @@ Thumbs.db
 
 # 런타임
 *.log
+__pycache__/
+*.pyc

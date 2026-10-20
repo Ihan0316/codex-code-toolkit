@@ -1,0 +1,52 @@
+{
+  "verified_on": "2026-10-20",
+  "timezone": "Asia/Seoul",
+  "registration": "Codex 앱 automation_update로 개별 생성. 이 JSON은 자동 등록하지 않는다.",
+  "policy": [
+    "모든 복제본 PAUSED 유지. 활성화는 별도 사용자 요청 필요.",
+    "원본 워크플로는 개인 경로·Notion/시트 ID를 포함하므로 로컬에서만 이관.",
+    "외부 쓰기와 다른 채팅 발송은 대상·내용에 대한 명시적 승인 필요.",
+    "삭제·의존성 설치·커밋·시스템 변경은 별도 확인.",
+    "메모리 원본은 자동 수정하지 않고 정리 후보만 보고.",
+    "사용 불가능한 도구의 성공을 추정하지 않음.",
+    "관제탑 유휴는 정상. 변동이 없으면 조용히 종료."
+  ],
+  "tasks": [
+    {
+      "workflow": "daily-report",
+      "status": "PAUSED",
+      "rrule": "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=17;BYMINUTE=40;BYSECOND=0",
+      "workflow_path": "<CODEX_HOME>/scheduled-tasks/daily-report/SKILL.md"
+    },
+    {
+      "workflow": "weekly-report",
+      "status": "PAUSED",
+      "rrule": "RRULE:FREQ=WEEKLY;BYDAY=FR;BYHOUR=17;BYMINUTE=45;BYSECOND=0",
+      "workflow_path": "<CODEX_HOME>/scheduled-tasks/weekly-report/SKILL.md"
+    },
+    {
+      "workflow": "control-tower-sweep-evening",
+      "status": "PAUSED",
+      "rrule": "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=18;BYMINUTE=3;BYSECOND=0",
+      "workflow_path": "<CODEX_HOME>/scheduled-tasks/control-tower-sweep-evening/SKILL.md"
+    },
+    {
+      "workflow": "control-tower-sweep-night",
+      "status": "PAUSED",
+      "rrule": "RRULE:FREQ=DAILY;BYHOUR=7,23;BYMINUTE=3;BYSECOND=0",
+      "workflow_path": "<CODEX_HOME>/scheduled-tasks/control-tower-sweep-night/SKILL.md"
+    },
+    {
+      "workflow": "control-tower-sweep",
+      "status": "PAUSED",
+      "rrule": "RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=9,10,11,12,13,14,15,16,17;BYMINUTE=3,23,43;BYSECOND=0",
+      "workflow_path": "<CODEX_HOME>/scheduled-tasks/control-tower-sweep/SKILL.md"
+    },
+    {
+      "workflow": "monthly-memory-consolidation",
+      "status": "PAUSED",
+      "rrule": "RRULE:FREQ=MONTHLY;BYDAY=FR;BYSETPOS=1;BYHOUR=14;BYMINUTE=0;BYSECOND=0",
+      "workflow_path": "<CODEX_HOME>/scheduled-tasks/monthly-memory-consolidation/SKILL.md"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "verified_on": "2026-10-20",
+  "source": "~/.claude/skills",
+  "destination": "~/.agents/skills",
+  "skills": [
+    "anydesign",
+    "built-in-browser",
+    "chrome-browser",
+    "codex-image",
+    "computer-use",
+    "d3-viz",
+    "deep-research",
+    "docs",
+    "docx",
+    "frontend-design",
+    "frontend-slides",
+    "google-workspace",
+    "import-memory",
+    "mcp-builder",
+    "morning",
+    "pdf",
+    "pptx",
+    "pptx-aim",
+    "pytorch-patterns",
+    "recursive-research",
+    "senior-computer-vision",
+    "skill-creator",
+    "theme-factory",
+    "web-artifacts-builder",
+    "webapp-testing",
+    "xlsx"
+  ],
+  "enabled_overrides": [
+    "codex-image",
+    "pptx-aim"
+  ],
+  "assets_required": [
+    "pptx-aim"
+  ],
+  "references_required": [
+    "google-workspace/references/docs.md",
+    "google-workspace/references/sheets.md"
+  ],
+  "distribution": "목록만 공개. 원본과 자산은 출처 라이선스·개인정보 확인 후 로컬에서 이관."
+}

@@ -1,5 +1,7 @@
 # 04. 자동 루틴 — codex exec · cron · notify
 
+> 현재 Windows Codex 복제 일정은 **6개 모두 중지**입니다. 정확한 예약식은 [12. Claude 설정 호환](12-claude-parity.md)과 [schedules.json](../examples/claude-parity/schedules.json)을 참고하세요. 아래 cron 설명은 수동 예제입니다.
+
 > 정해 둔 시각에 OS 스케줄러(cron/launchd)가 헤드리스 `codex exec`를 깨워, 미리 작성해 둔 절차를 사람 손 없이 수행하게 만드는 구조를 다룹니다. 일간·주간 보고 취합처럼 "매번 같은 일"을 스케줄러에 위임하는 방법, 읽기 전용 샌드박스로 안전하게 보고를 만드는 법, 그리고 `notify`로 턴 완료 후 후처리를 붙이는 법을 설명합니다.
 
 ---

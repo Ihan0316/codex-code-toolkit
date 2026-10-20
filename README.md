@@ -6,7 +6,7 @@
 
 _단순 "이렇게 하세요"가 아니라 — **무엇을 / 왜 썼고 / 무엇이 좋아졌는지**까지._
 
-![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20WSL2-0a7d5a)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux%20%7C%20WSL2-0a7d5a)
 ![Codex CLI](https://img.shields.io/badge/Codex%20CLI-AGENTS.md·sandbox·hooks·MCP-10a37f)
 ![Docs](https://img.shields.io/badge/docs-한국어-brightgreen)
 ![Sanitized](https://img.shields.io/badge/secrets-0%20유출-success)
@@ -24,7 +24,7 @@ _단순 "이렇게 하세요"가 아니라 — **무엇을 / 왜 썼고 / 무엇
 
 > [!NOTE]
 > 이 저장소는 특정 회사·프로젝트 코드가 아니라, **누구나 자기 환경에 그대로 옮겨 쓸 수 있는 일반화된 셋업 패턴**만 담았습니다.
-> 개인 경로·자격증명·내부 식별자는 모두 placeholder(`<...>`)로 치환했습니다. 경로는 macOS/Linux 기준(`~/.codex/...`)이며, Windows는 **WSL2 안에서 동일**하게 동작합니다.
+> 개인 경로·자격증명·내부 식별자는 placeholder(`<...>`)로 치환합니다. 기존 bash 예제는 macOS/Linux/WSL2용입니다. **Windows 네이티브용 훅 12개·스킬 26개 목록·중지 일정 6개**는 [12. Claude 설정 호환](docs/12-claude-parity.md)을 참고하세요. 개인 정책 훅·제3자 스킬 본문은 별도 로컬 원본이 필요합니다.
 
 ## 📑 목차
 
@@ -80,6 +80,7 @@ flowchart TB
 | 🤖 **서브에이전트** | 작업을 서브에이전트·`codex exec` 팬아웃으로 분산 | 대규모 리뷰/리서치/마이그레이션 병렬 | [09-subagents](docs/09-subagents.md) |
 | 🧩 **확장 생태계** | skills·MCP·`/apps`·`/plugins` 설치·관리 | 도구를 묶음으로 켜고 끄기 | [10-ecosystem](docs/10-ecosystem.md) |
 | 🗺️ **전체 인벤토리** | 무엇이 담기고 무엇이 빠졌나 (커버리지 맵) | "전부 담겼나"에 대한 답 | [11-inventory](docs/11-inventory.md) |
+| **Claude 설정 호환** | Windows 훅 12개·스킬 26개 목록·중지 일정 6개 | 현재 로컬 설정의 공개 가능한 정의와 이관 절차 | [12-claude-parity](docs/12-claude-parity.md) |
 
 > [!TIP]
 > 처음이라면 → **[00. 빠른 시작](docs/00-quickstart.md)** 부터 보세요. 10분이면 핵심 3개(AGENTS.md·샌드박스·메모리)를 켤 수 있습니다.

@@ -20,7 +20,7 @@
 > `~/.codex/`를 **통째로 git에 올리는 것은 위험**합니다. `auth.json`(ChatGPT 로그인/ API 키)이 함께 커밋되면 토큰이 그대로 새어 나가고, `history.jsonl`·`sessions/`는 머신 간 덮어쓰기로 대화·세션 상태를 망가뜨립니다. **무엇을 올리고 무엇을 뺄지 선별이 전부**입니다.
 
 > [!NOTE]
-> **Windows는 WSL2 안에서 동일**합니다. Codex는 Windows에서 WSL2를 경유하므로 `~/.codex`는 리눅스 홈(`/home/<user>/.codex`)에 있습니다. `C:\Users\...`가 아닙니다. 즉 회사가 Windows여도 실제로는 **양쪽 다 리눅스/맥 홈** — 훅·스크립트는 어디서나 **bash/python** 하나로 통일됩니다(PowerShell 분기 불필요).
+> Windows 네이티브 Codex는 Windows 사용자 홈의 `.codex`를 사용합니다. WSL2에서 실행하는 Codex는 WSL 홈의 `.codex`를 사용합니다. 셸·Python·경로를 환경별로 구분하세요. Windows PowerShell용 현재 설정은 [12. Claude 설정 호환](12-claude-parity.md)에 있습니다.
 
 ---
 

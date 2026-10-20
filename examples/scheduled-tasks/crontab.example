@@ -11,8 +11,10 @@
 PATH=/usr/local/bin:/usr/bin:/bin
 # CODEX_API_KEY=<발급키>          # headless 인증이 필요할 때만. 실제 키를 공개 저장소에 커밋 금지!
 
-# 평일(월~금) 19:00 — 일일보고
-0 19 * * 1-5  bash <경로>/daily-report.sh >> <경로>/cron.log 2>&1
+# 평일(월~금) 17:40 — 일일보고 (복제본 중지 유지)
+# 40 17 * * 1-5  bash <경로>/daily-report.sh >> <경로>/cron.log 2>&1
 
-# 매주 금 18:30 — 주간보고
-30 18 * * 5   bash <경로>/weekly-report.sh >> <경로>/cron.log 2>&1
+# 매주 금 17:45 — 주간보고 (복제본 중지 유지)
+# 45 17 * * 5   bash <경로>/weekly-report.sh >> <경로>/cron.log 2>&1
+# 전체 6개 일정은 ../claude-parity/schedules.json 참조.
+# 월간 첫 금요일은 날짜·요일 OR 조건인 `0 14 1-7 * 5`로 등록하지 않습니다.
