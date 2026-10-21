@@ -585,7 +585,7 @@ a:hover { text-decoration: underline; text-underline-offset: 3px; }
   font-size: clamp(26px, 3.4vw, 42px); font-weight: 750; letter-spacing: -.032em;
   margin: 0 0 12px; word-break: keep-all; color: inherit;
 }
-.lp-band p { position: relative; z-index: 1; font-size: 15.5px; margin: 0 auto 28px; max-width: 520px; word-break: keep-all; opacity: .85; }
+.markdown-body .lp-band p { position: relative; z-index: 1; font-size: 15.5px; margin: 0 auto 28px; max-width: 520px; word-break: keep-all; opacity: .85; }
 .lp-band .lp-cta { position: relative; z-index: 1; justify-content: center; animation: none; }
 .lp-band .btn-primary { background: var(--accent-ink); color: var(--accent); box-shadow: none; }
 .lp-band .btn-ghost { border-color: color-mix(in srgb, var(--accent-ink) 40%, transparent); color: var(--accent-ink); }
